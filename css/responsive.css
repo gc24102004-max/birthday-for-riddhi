@@ -1,0 +1,38 @@
+/* =====================================================================
+   responsive.css — the base (style.css) is already built for phones.
+   These rules only add room on bigger screens. Checked at 320, 360, 375,
+   390, 430, 768, 1024 and 1440 px.
+   ===================================================================== */
+@media (max-width: 359px) {
+  :root { --pad: 16px; }
+  .chapter { font-size: 0.62rem; letter-spacing: 0.16em; }
+  .step.has-name .card-frame { height: min(40dvh, 360px); }
+  .cd-grid { gap: 8px; }
+  .btn-glow { padding-inline: 1.3em; }
+}
+@media (max-height: 640px) {
+  .card-frame { height: min(42dvh, 340px); }
+  .step.has-name .card-frame { height: min(36dvh, 300px); }
+  .cd-wrap { padding-top: calc(env(safe-area-inset-top) + 64px); }
+  .cd-card { padding-block: 12px 10px; }
+}
+@media (min-width: 600px) {
+  :root { --bar-h: 72px; --ctl-h: 100px; }
+  .cd-grid { grid-template-columns: repeat(4, 1fr); width: min(100%, 620px); }
+  .step .lines { max-width: 40rem; }
+  .card-frame { height: min(56dvh, 560px); }
+  .step.has-name .card-frame { height: min(50dvh, 500px); }
+}
+@media (min-width: 1000px) {
+  .line { font-size: 2.1rem; }
+  .line.big { font-size: 3rem; }
+  .card-lines .line { font-size: 1.4rem; }
+  .step .lines { max-width: 46rem; }
+  .para { font-size: 1.7rem; }
+  .letter-wrap { max-width: 42rem; }
+}
+@media (max-height: 520px) and (orientation: landscape) {
+  .card-frame, .step.has-name .card-frame { height: 46dvh; }
+  .step { justify-content: center; }
+  .hero-wrap, .cd-wrap { padding-block: 70px 30px; }
+}

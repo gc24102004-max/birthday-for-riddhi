@@ -1,0 +1,92 @@
+/* =====================================================================
+   animations.css — all motion. Everything is short or runs a limited
+   number of times, pauses when the tab is hidden, and switches off for
+   visitors who prefer reduced motion (bottom of file).
+   ===================================================================== */
+
+/* ---------------- page enter / leave (soft blur, like a camera) ---------------- */
+@keyframes page-in { from { opacity: 0; filter: blur(14px); transform: scale(1.03); } to { opacity: 1; filter: blur(0); transform: scale(1); } }
+.page-root, .player { animation: page-in 0.9s var(--ease) backwards; }
+body.is-leaving .page-root, body.is-leaving .player { opacity: 0; filter: blur(16px); transform: scale(1.05); transition: opacity 0.6s ease, filter 0.6s ease, transform 0.6s ease; }
+
+/* ---------------- text lines appear slowly, one after another ---------------- */
+@keyframes line-in { from { opacity: 0; transform: translateY(14px); filter: blur(6px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
+.step .line, .step .label, .step .name-tag, .step .hint { opacity: 0; animation: line-in calc(1.3s * var(--pace, 1)) var(--ease) forwards; animation-delay: calc(var(--i, 0) * var(--stagger, 1.1s) + var(--base, 0.2s)); }
+.step.is-leaving { opacity: 0; transition: opacity 0.4s ease; }
+.step { opacity: 1; }
+.step.is-entering { animation: step-in calc(0.5s * var(--pace, 1)) ease both; }
+@keyframes step-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* photo cards slide in like a swipe */
+@keyframes card-in { from { opacity: 0; transform: translateX(46px) scale(0.97); } to { opacity: 1; transform: translateX(0) scale(1); } }
+.card-frame, .polaroid { animation: card-in calc(0.8s * var(--pace, 1)) var(--ease) both; }
+.polaroid { animation-name: pol-in; }
+@keyframes pol-in { from { opacity: 0; transform: translateY(40px) rotate(calc(var(--rot, 0deg) + 6deg)); } to { opacity: 1; transform: translateY(0) rotate(var(--rot, 0deg)); } }
+@keyframes bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -8px; } }
+.polaroid .pic { animation: none; }
+.step .polaroid { animation: pol-in calc(0.9s * var(--pace, 1)) var(--ease) both, bob 6s ease-in-out 1s 4; }
+
+@keyframes bounce-in { 0% { opacity: 0; transform: scale(0.4); } 55% { opacity: 1; transform: scale(1.25) rotate(-4deg); } 75% { opacity: 1; transform: scale(0.92) rotate(3deg); } 100% { opacity: 1; transform: scale(1) rotate(0); } }
+.name-tag.bounce { animation: bounce-in 0.9s cubic-bezier(0.3, 1.4, 0.5, 1) forwards; animation-delay: 0.1s; }
+
+/* full-screen photo: slow cinematic zoom */
+@keyframes slowzoom { from { transform: scale(1); } to { transform: scale(1.14); } }
+.bg-layer.zoom img { animation: slowzoom 26s ease-out forwards; }
+.bg-layer { transition: opacity calc(0.9s * var(--pace, 1)) ease; }
+
+/* chain of words */
+@keyframes word-in { 0% { opacity: 0; transform: translateY(12px) scale(0.96); filter: blur(5px); } 25% { opacity: 1; transform: none; filter: none; } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); filter: blur(3px); } }
+.chain .word { animation: word-in 1.3s ease forwards; }
+.chain .word.final { animation: line-in 1.8s var(--ease) forwards; }
+
+/* progress bar */
+@keyframes fill { from { width: 0; } to { width: 100%; } }
+.progress .seg.run .fill { animation: fill var(--dur, 6s) linear forwards; }
+.player.is-paused .progress .seg.run .fill { animation-play-state: paused; }
+
+/* CTA and controls */
+@keyframes cta-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.cta-wrap .btn-glow { animation: cta-in 1.1s var(--ease) both; }
+@keyframes glow-pulse { 0%, 100% { box-shadow: 0 0 22px rgba(233, 201, 143, 0.25), inset 0 0 18px rgba(233, 201, 143, 0.08); } 50% { box-shadow: 0 0 46px rgba(233, 201, 143, 0.55), inset 0 0 22px rgba(233, 201, 143, 0.16); } }
+.btn-glow.pulse { animation: cta-in 1.1s var(--ease) both, glow-pulse 3.2s ease-in-out 1.2s 8; }
+
+/* menu */
+@keyframes menu-in { from { opacity: 0; } to { opacity: 1; } }
+.menu:not([hidden]) { animation: menu-in 0.3s ease both; }
+
+/* hero (index) */
+@keyframes rise { from { opacity: 0; transform: translateY(18px); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
+.hero-title { animation: rise calc(2s * var(--pace, 1)) var(--ease) calc(0.6s * var(--pace, 1)) both; }
+.hero-sub { animation: rise calc(2s * var(--pace, 1)) var(--ease) calc(1.8s * var(--pace, 1)) both; }
+.hero-wrap .btn-glow { animation: rise calc(1.8s * var(--pace, 1)) var(--ease) calc(3.2s * var(--pace, 1)) both, glow-pulse 3.2s ease-in-out calc(5s * var(--pace, 1)) 8; }
+body.entering .hero-wrap { transition: filter 0.9s ease, opacity 0.9s ease, transform 0.9s ease; filter: blur(18px); opacity: 0; transform: scale(1.08); }
+
+/* countdown numbers: old slides up, new rises in */
+@keyframes num-out { to { opacity: 0; transform: translateY(-45%); filter: blur(3px); } }
+@keyframes num-in { from { opacity: 0; transform: translateY(45%); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
+.cd-num span.out { animation: num-out 0.45s ease forwards; }
+.cd-num span.in { animation: num-in 0.45s ease both; }
+
+/* birthday reveal */
+@keyframes reveal-in { from { opacity: 0; transform: scale(0.9); filter: blur(10px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes day-glow { 0% { opacity: 0; transform: scale(0.5); } 60% { opacity: 1; transform: scale(1.06); } 100% { opacity: 1; transform: scale(1); } }
+.reveal .r-day { animation: day-glow 2.2s var(--ease) both; }
+.reveal .r-item { animation: reveal-in calc(1.6s * max(var(--pace, 1), 0.7)) var(--ease) both; }
+.reveal.fade-out { opacity: 0; transition: opacity 0.9s ease; }
+
+/* sukoon: slow breathing glow (limited number of breaths) */
+@keyframes breathe { 0%, 100% { opacity: 0.35; transform: translate(-50%, -50%) scale(0.92); } 50% { opacity: 0.9; transform: translate(-50%, -50%) scale(1.08); } }
+body.theme-sukoon .glow { animation: breathe 7s ease-in-out 0s 10; }
+
+/* letter: slow reveal when scrolled into view */
+.js .fx { opacity: 0; transform: translateY(24px); filter: blur(5px); transition: opacity 1.4s var(--ease), transform 1.4s var(--ease), filter 1.4s var(--ease); }
+.js .fx.in { opacity: 1; transform: none; filter: none; }
+
+/* ----------------------------------------- reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; animation-delay: 0s !important; transition-duration: 0.01ms !important; transition-delay: 0s !important; }
+  .step .line, .step .label, .step .name-tag, .step .hint { opacity: 1; }
+  .js .fx { opacity: 1; transform: none; filter: none; }
+  .stars, .glow { display: none; }
+}
