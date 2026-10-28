@@ -15,7 +15,7 @@ const BIRTHDAY_DATE = "2026-11-16";        // YEAR-MONTH-DAY  (16 November 2026)
             true  = FINAL MODE   (nothing opens until the countdown ends)
    When you are ready, change false to true, save, and upload this file.
    --------------------------------------------------------------------- */
-const LOCK_UNTIL_BIRTHDAY = false;
+const LOCK_UNTIL_BIRTHDAY = true;
 
 /* ---------------------------------------------------------------------
    MUSIC (both optional, mp3 files in assets/audio/)
