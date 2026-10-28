@@ -302,11 +302,65 @@
       current: function () { return current; },
       paused: function () { return audio.paused; },
       level: function () { return level; },
+      debug: function () {
+        return { current: current, failed: failed, paused: audio.paused, volume: audio.volume, level: level, ready: audio.readyState, net: audio.networkState,
+                 err: audio.error ? audio.error.code : 0, armed: armed, userPaused: userPaused(), tracks: [trackBefore, trackAfter], btn: !!btn };
+      },
+      playNow: function () { audio.volume = target(); return audio.play(); },
     };
     apply(true);
     schedule();
   }
   initMusic();
+
+  /* ------------------------------------------- music check (?music=debug) */
+  // Open any page with ?music=debug to see, on screen, why the music is or is
+  // not playing (file found? format ok? waiting for a tap?).
+  if (new URLSearchParams(location.search).get("music") === "debug") {
+    var box = RB.el("div", "music-debug");
+    box.style.cssText = "position:fixed;left:8px;right:8px;bottom:8px;z-index:200;max-height:62vh;overflow:auto;padding:12px 14px;border-radius:14px;background:rgba(0,0,0,.92);border:1px solid #e9c98f;color:#f7ebe0;font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap";
+    var out = RB.el("div"); box.appendChild(out);
+    var tapBtn = RB.el("button", "", "Test play (tap me)");
+    tapBtn.style.cssText = "margin-top:8px;min-height:44px;padding:0 16px;border-radius:999px;border:1px solid #e9c98f;background:#2a0a18;color:#f7ebe0;font:600 14px system-ui";
+    var res = RB.el("div"); res.style.marginTop = "6px";
+    box.appendChild(tapBtn); box.appendChild(res);
+    document.body.appendChild(box);
+    var files = {};
+    [AUDIO.countdownTrack, AUDIO.birthdayTrack].forEach(function (u) {
+      if (typeof u !== "string" || !u.trim()) { return; }
+      files[u] = "checking...";
+      if (location.protocol === "file:" || typeof fetch !== "function") { files[u] = "(cannot check from a local file)"; return; }
+      fetch(u, { method: "HEAD" }).then(function (r) {
+        var size = r.headers.get("content-length");
+        files[u] = "HTTP " + r.status + " | " + (r.headers.get("content-type") || "no type") + (size ? " | " + Math.round(size / 1024) + " KB" : "");
+      }).catch(function (e) { files[u] = "request failed: " + e.message; });
+    });
+    var ERR = { 0: "none", 1: "aborted", 2: "network error", 3: "decode error (file is damaged / wrong format)", 4: "file not found or format not supported" };
+    function paint() {
+      var d = RB.music.debug ? RB.music.debug() : null;
+      var lines = ["MUSIC CHECK  (page: " + page + ")", "time phase: " + (RB.beforeBirthday() ? "BEFORE birthday -> countdown song" : "birthday started -> birthday song"), ""];
+      Object.keys(files).forEach(function (u) { lines.push(u + "\n   -> " + files[u]); });
+      if (!d) { lines.push("", "No song is set up (check AUDIO in js/data.js)."); }
+      else {
+        lines.push("", "song in use: " + (d.current || "none"));
+        lines.push("playing: " + (d.paused ? "NO" : "YES") + "   volume: " + d.volume.toFixed(2) + "   level: " + d.level);
+        lines.push("waiting for a tap: " + (d.armed ? "YES (tap anywhere once)" : "no") + "   music button shown: " + (d.btn ? "yes" : "no"));
+        lines.push("paused by you earlier: " + (d.userPaused ? "YES (press the music button)" : "no"));
+        lines.push("file error: " + ERR[d.err] + "   (readyState " + d.ready + ")");
+        var bad = Object.keys(d.failed);
+        if (bad.length) lines.push("FAILED to load: " + bad.join(", "));
+      }
+      out.textContent = lines.join("\n");
+    }
+    tapBtn.addEventListener("click", function () {
+      if (!RB.music.playNow) { res.textContent = "No song is set up."; return; }
+      var pr = RB.music.playNow();
+      if (pr && pr.then) pr.then(function () { res.textContent = "play() worked. If you still hear nothing: check phone volume / silent switch."; })
+        .catch(function (e) { res.textContent = "play() failed: " + e.name + " - " + e.message; });
+    });
+    paint();
+    setInterval(paint, 800);
+  }
 
   /* ------------------------------------------------------- opening page */
   var enter = document.getElementById("enter");
